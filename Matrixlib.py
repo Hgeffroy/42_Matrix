@@ -44,80 +44,8 @@ class Vector(Generic[T]):
             coord.append(self._coordinates[c] * scalar)
         return Vector(coord)
 
-    def tomatrix(self):
-        return Matrix([self._coordinates])
-
     def getcoordinates(self) -> List[T]:
         return self._coordinates
-
-
-class Matrix(Generic[T]):
-    """
-    Class representing a matrix of int.
-    """
-
-    def __init__(self, values: List[List[T]]):
-        for val in values:
-            if len(val) != len(values[0]):
-                raise ValueError("Matrix columns must have the same length.")
-
-        self._columnsNb = len(values)
-        self._rowsNb = len(values[0])
-        self._values = values
-
-    def __str__(self):
-        string = ""
-        for col in self._values:
-            for val in col:
-                string += f'{val} '
-            string += '\n'
-
-        return string
-
-    def __sizeof__(self):
-        return self._columnsNb * self._rowsNb
-
-    def __add__(self, other):
-        values = []
-        for c in range(self._columnsNb):
-            col = []
-            for r in range(self._rowsNb):
-                col.append(self._values[r][c] + other.getValues()[r][c])
-            values.append(col)
-        return Matrix(values)
-
-    def __sub__(self, other):
-        values = []
-        for c in range(self._columnsNb):
-            col = []
-            for r in range(self._rowsNb):
-                col.append(self._values[r][c] - other.getValues()[r][c])
-            values.append(col)
-        return Matrix(values)
-
-    def __mul__(self, scalar: T):
-        values = []
-        for c in range(self._columnsNb):
-            col = []
-            for r in range(self._rowsNb):
-                col.append(self._values[r][c] * scalar)
-            values.append(col)
-        return Matrix(values)
-
-    def tovector(self):
-        coordinates = []
-        for col in self._values:
-            coordinates.extend(col)
-        return Vector(coordinates)
-
-    def getvalues(self) -> List[List[T]]:
-        return self._values
-
-    def shape(self) -> Tuple[int, int]:
-        return self._rowsNb, self._columnsNb
-
-    def issquare(self) -> bool:
-        return self._rowsNb == self._columnsNb
 
 
 def linear_combination(u: List[Vector[T]], coefs: List[T]) -> Vector[T]:
