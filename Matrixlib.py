@@ -1,5 +1,6 @@
 from typing import List, Tuple, TypeVar, Generic
 import math
+import copy
 
 
 # Conditions for T:
@@ -152,6 +153,51 @@ class Matrix(Generic[T]):
         return Matrix([Vector([self._columns[i].get_coordinates()[j]
                                for i in range(self._nbcolumns)]) for j in range(self._nbrows)])
 
+    def row_echelon(self) -> 'Matrix[T]':
+        m = self.transpose()
+        mcol = m.get_columns()
+        h = 0
+        k = 0
+
+        while h < self._nbrows and k < self._nbcolumns:
+            lst_pivots = [mcol[i].get_coordinates()[k] for i in range(h, self._nbrows)]
+            i_max = lst_pivots.index(max(lst_pivots)) + h
+            if mcol[i_max].get_coordinates()[k] == 0:
+                k += 1
+            else:
+                mcol = swap_vectors(mcol, h, i_max)
+                for i in range(h + 1, self._nbrows):
+                    ratio = mcol[i].get_coordinates()[k] / mcol[h].get_coordinates()[k]
+                    mcol[i] = mcol[i] - mcol[h] * ratio
+
+                h += 1
+                k += 1
+
+        return Matrix(mcol).transpose()
+
+    def determinant(self) -> T:
+        if self._nbcolumns != self._nbrows:
+            raise ValueError('Matrix must be square to compute determinant')
+        if self._nbcolumns > 4 or self._nbcolumns < 2:
+            raise ValueError('Cannot compute determinant of matrix with more than 4 columns or less than 2')
+
+        if self._nbcolumns == 2:
+            det = (self._columns[0].get_coordinates()[0] * self._columns[1].get_coordinates()[1] -
+                    self._columns[0].get_coordinates()[1] * self._columns[1].get_coordinates()[0])
+            return det
+
+        else:
+            det = self._type()
+            lst = [self._columns[j].get_coordinates() for j in range(1, self._nbcolumns)]
+            for i in range(0, self._nbcolumns):
+                lst_vec = []
+                for j in range(len(lst)):
+                    lst_tmp = copy.deepcopy(lst)
+                    lst_tmp[j].pop(i)
+                    lst_vec.append(Vector(lst_tmp[j]))
+                det += Matrix(lst_vec).determinant() * pow(-1, i) * self._columns[0].get_coordinates()[i]
+            return det
+
 
 def linear_combination(u: List[Vector[T]], coefs: List[T]) -> Vector[T]:
     if len(u) != len(coefs) or len(u) == 0:
@@ -190,6 +236,13 @@ def cross_product(u: Vector[T], v: Vector[T]) -> Vector[T]:
     return Vector([ucoord[1] * vcoord[2] - ucoord[2] * vcoord[1],
                    ucoord[2] * vcoord[0] - ucoord[0] * vcoord[2],
                    ucoord[0] * vcoord[1] - ucoord[1] * vcoord[0]])
+
+
+def swap_vectors(vectors: List[Vector[T]], row1: int, row2: int) -> List[Vector[T]]:
+    tmp = vectors[row1]
+    vectors[row1] = vectors[row2]
+    vectors[row2] = tmp
+    return vectors
 
 
 

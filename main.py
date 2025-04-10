@@ -149,6 +149,33 @@ def test09():
     print(m3)
     print(m3.transpose())
 
+def test10():
+    m1 = Matrix([Vector([1., 0., 0.]), Vector([0., 1., 0.]), Vector([0., 0., 1.])])
+    m2 = Matrix([Vector([1., 2.]), Vector([3., 4.])])
+    m3 = Matrix([Vector([1., 2.]), Vector([2., 4.])])
+    m4 = Matrix([Vector([2., -5., 0.]),
+                 Vector([4., 3., 7.]),
+                 Vector([-2., 3., 4.])])
+    m5 = Matrix([Vector([8., 5., -2., 4., 28.]),
+                 Vector([4., 2.5, 20., 4., -4.]),
+                 Vector([8., 5., 1., 4., 17.])])
+
+    print(m1.row_echelon())
+    print(m2.row_echelon())
+    print(m3.row_echelon())
+    print(m4.row_echelon())
+    print(m5.row_echelon())
+
+
+def test11():
+    m1 = Matrix([Vector([2., 0., 0.]), Vector([0., 2., 0.]), Vector([0., 0., 2.])])
+    m2 = Matrix([Vector([8., 4., 7.]), Vector([5., 7., 6.]), Vector([-2., 20., 1.])])
+    m3 = Matrix([Vector([8., 4., 8., 28.]), Vector([5., 2.5, 5., -4.]), Vector([-2., 20., 1., 17.]), Vector([4., 4., 4., 1.])])
+
+    print(m1.determinant())
+    print(m2.determinant())
+    print(m3.determinant())
+
 
 def main():
     # test00()
@@ -160,7 +187,9 @@ def main():
     # test06()
     # test07()
     # test08()
-    test09()
+    # test09()
+    # test10()
+    test11()
     return
 
 
