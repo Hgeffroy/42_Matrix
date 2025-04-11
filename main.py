@@ -151,7 +151,7 @@ def test09():
 
 def test10():
     m1 = Matrix([Vector([1., 0., 0.]), Vector([0., 1., 0.]), Vector([0., 0., 1.])])
-    m2 = Matrix([Vector([1., 2.]), Vector([3., 4.])])
+    m2 = Matrix([Vector([1., 3.]), Vector([2., 4.])])
     m3 = Matrix([Vector([1., 2.]), Vector([2., 4.])])
     m4 = Matrix([Vector([2., -5., 0.]),
                  Vector([4., 3., 7.]),
@@ -177,6 +177,27 @@ def test11():
     print(m3.determinant())
 
 
+def test12():
+    m1 = identity_matrix(3, float)
+    m2 = m1 * 2
+    m3 = Matrix([Vector([8., 5., -2]), Vector([4., 7., 20.]), Vector([7., 6., 1.])])
+    m4 = Matrix([Vector([1., 0., 1]), Vector([0., 1., 0.]), Vector([0., 0., 1.])])
+
+    print(m1.inverse().mul_mat(m1))
+    print(m2.inverse().mul_mat(m2))
+    print(m3.inverse().mul_mat(m3))
+    print(m4.inverse().mul_mat(m4))
+
+def test13():
+    m1 = identity_matrix(3, float)
+    m2 = Matrix([Vector([1., 2., 0., 0.]), Vector([2., 4., 0., 0.]), Vector([-1., 2., 1., 1.])])
+    m3 = Matrix([Vector([8., 5., -2.]), Vector([4., 7., 20.]), Vector([7., 6., 1.]), Vector([21., 18., 7.])])
+
+    print(m1.rank())
+    print(m2.rank())
+    print(m3.rank())
+
+
 def main():
     # test00()
     # test01()
@@ -189,7 +210,9 @@ def main():
     # test08()
     # test09()
     # test10()
-    test11()
+    # test11()
+    # test12()
+    test13()
     return
 
 

@@ -57,6 +57,9 @@ class Vector(Generic[T]):
     def get_size(self) -> int:
         return self._size
 
+    def is_null(self) -> bool:
+        return all(self._coordinates[i] == self._type() for i in range(self._size))
+
     def dot(self, v: 'Vector[T]') -> float:
         if self._size != len(v):
             raise ValueError('Vector does not have the same size')
@@ -154,36 +157,35 @@ class Matrix(Generic[T]):
                                for i in range(self._nbcolumns)]) for j in range(self._nbrows)])
 
     def row_echelon(self) -> 'Matrix[T]':
-        m = self.transpose()
-        mcol = m.get_columns()
+        m_col = self.transpose().get_columns()
         h = 0
         k = 0
 
         while h < self._nbrows and k < self._nbcolumns:
-            lst_pivots = [mcol[i].get_coordinates()[k] for i in range(h, self._nbrows)]
+            lst_pivots = [m_col[i].get_coordinates()[k] for i in range(h, self._nbrows)]
             i_max = lst_pivots.index(max(lst_pivots)) + h
-            if mcol[i_max].get_coordinates()[k] == 0:
+            if m_col[i_max].get_coordinates()[k] == 0:
                 k += 1
             else:
-                mcol = swap_vectors(mcol, h, i_max)
+                m_col = swap_vectors(m_col, h, i_max)
                 for i in range(h + 1, self._nbrows):
-                    ratio = mcol[i].get_coordinates()[k] / mcol[h].get_coordinates()[k]
-                    mcol[i] = mcol[i] - mcol[h] * ratio
+                    ratio = m_col[i].get_coordinates()[k] / m_col[h].get_coordinates()[k]
+                    m_col[i] = m_col[i] - m_col[h] * ratio
 
                 h += 1
                 k += 1
 
-        return Matrix(mcol).transpose()
+        return Matrix(m_col).transpose()
 
     def determinant(self) -> T:
         if self._nbcolumns != self._nbrows:
             raise ValueError('Matrix must be square to compute determinant')
-        if self._nbcolumns > 4 or self._nbcolumns < 2:
-            raise ValueError('Cannot compute determinant of matrix with more than 4 columns or less than 2')
+        if self._nbcolumns < 2:
+            raise ValueError('Cannot compute determinant of matrix with less than 2 columns')
 
         if self._nbcolumns == 2:
             det = (self._columns[0].get_coordinates()[0] * self._columns[1].get_coordinates()[1] -
-                    self._columns[0].get_coordinates()[1] * self._columns[1].get_coordinates()[0])
+                   self._columns[0].get_coordinates()[1] * self._columns[1].get_coordinates()[0])
             return det
 
         else:
@@ -197,6 +199,67 @@ class Matrix(Generic[T]):
                     lst_vec.append(Vector(lst_tmp[j]))
                 det += Matrix(lst_vec).determinant() * pow(-1, i) * self._columns[0].get_coordinates()[i]
             return det
+
+    def _gauss_descent(self) -> Tuple['Matrix[T]', 'Matrix[T]']:
+        m_id = identity_matrix(self._nbcolumns, self._type).get_columns()  # No need to transpose since transpose(I) = I
+        m_col = self.transpose().get_columns()
+        h = 0
+        k = 0
+
+        while h < self._nbrows and k < self._nbcolumns:
+            lst_pivots = [m_col[i].get_coordinates()[k] for i in
+                          range(h, self._nbrows)]
+            i_max = lst_pivots.index(max(lst_pivots)) + h
+            if m_col[i_max].get_coordinates()[k] == 0:
+                k += 1
+            else:
+                m_col = swap_vectors(m_col, h, i_max)
+                m_id = swap_vectors(m_id, h, i_max)
+                for i in range(h + 1, self._nbrows):
+                    ratio = m_col[i].get_coordinates()[k] / m_col[h].get_coordinates()[k]
+                    m_col[i] = m_col[i] - m_col[h] * ratio
+                    m_id[i] = m_id[i] - m_id[h] * ratio
+
+                h += 1
+                k += 1
+
+        return Matrix(m_col), Matrix(m_id)
+
+    def _gauss_ascent(self, m: 'Matrix[T]', identity: 'Matrix[T]') -> Tuple['Matrix[T]', 'Matrix[T]']:
+        m_col = m.get_columns()
+        m_id = identity.get_columns()
+
+        for i in range(self._nbcolumns - 1, -1, -1):
+            for j in range(i - 1, -1, -1):
+                ratio = m_col[j].get_coordinates()[i] / m_col[i].get_coordinates()[i]
+                m_col[j] = m_col[j] - m_col[i] * ratio
+                m_id[j] = m_id[j] - m_id[i] * ratio
+            ratio = 1 / m_col[i].get_coordinates()[i]
+            m_col[i] = m_col[i] * ratio
+            m_id[i] = m_id[i] * ratio
+
+        return Matrix(m_col).transpose(), Matrix(m_id).transpose()
+
+    def inverse(self) -> 'Matrix[T]':
+        if self._nbcolumns != self._nbrows:
+            raise ValueError('Matrix must be square to be invertible')
+        if self.determinant() == 0:
+            raise Exception('Matrix is singular')
+
+        m, m_id = self._gauss_descent()
+        m, m_id = self._gauss_ascent(m, m_id)
+
+        return m_id
+
+    def rank(self) -> int:
+        m = self.row_echelon()
+        m_col = m.transpose().get_columns()
+        count = 0
+        for i in range(len(m_col)):
+            if not m_col[i].is_null():
+                count += 1
+
+        return count
 
 
 def linear_combination(u: List[Vector[T]], coefs: List[T]) -> Vector[T]:
@@ -244,6 +307,13 @@ def swap_vectors(vectors: List[Vector[T]], row1: int, row2: int) -> List[Vector[
     vectors[row2] = tmp
     return vectors
 
+
+def identity_matrix(sz: int, tp: type) -> Matrix[T]:
+    lst_identity = []
+    for i in range(sz):
+        lst_identity.append([tp()] * sz)
+        lst_identity[i][i] = tp(1)
+    return Matrix([Vector(lst_identity[i]) for i in range(sz)])
 
 
 
