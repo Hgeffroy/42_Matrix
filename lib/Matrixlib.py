@@ -27,10 +27,11 @@ class Vector(Generic[T]):
 
     def __str__(self) -> str:
         string = ''
-        for coord in self._coordinates:
-            string += f'{coord}   '
-
-        return string + '\n'
+        for i in range(self._size):
+            string += f'{self._coordinates[i]}'
+            if i != self._size - 1:
+                string += ', '
+        return string
 
     def __len__(self) -> int:
         return self._size
@@ -107,10 +108,8 @@ class Matrix(Generic[T]):
 
     def __str__(self) -> str:
         string = ''
-        for i in range(self._nbrows):
-            for j in range(self._nbcolumns):
-                string += f'{self._columns[j].get_coordinates()[i]}   '
-            string += '\n'
+        for i in range(self._nbcolumns):
+            string += f'{self._columns[i]}\n'
         return string
 
     def __add__(self, other: 'Matrix[T]') -> 'Matrix[T]':
@@ -322,6 +321,9 @@ def identity_matrix(sz: int, tp: type) -> Matrix[T]:
         lst_identity.append([tp()] * sz)
         lst_identity[i][i] = tp(1)
     return Matrix([Vector(lst_identity[i]) for i in range(sz)])
+
+
+
 
 
 
