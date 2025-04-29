@@ -163,12 +163,14 @@ class Matrix(Generic[T]):
                                for i in range(self._nbcolumns)]) for j in range(self._nbrows)])
 
     def row_echelon(self) -> 'Matrix[T]':
+        print(f'self: \n{self}')
         m_col = self.transpose().get_columns()
         h = 0
         k = 0
 
         while h < self._nbrows and k < self._nbcolumns:
-            lst_pivots = [m_col[i].get_coordinates()[k] for i in range(h, self._nbrows)]
+            print('iter')
+            lst_pivots = [abs(m_col[i].get_coordinates()[k]) for i in range(h, self._nbrows)]
             i_max = lst_pivots.index(max(lst_pivots)) + h
             if m_col[i_max].get_coordinates()[k] == 0:
                 k += 1
@@ -213,7 +215,7 @@ class Matrix(Generic[T]):
         k = 0
 
         while h < self._nbrows and k < self._nbcolumns:
-            lst_pivots = [m_col[i].get_coordinates()[k] for i in
+            lst_pivots = [abs(m_col[i].get_coordinates()[k]) for i in
                           range(h, self._nbrows)]
             i_max = lst_pivots.index(max(lst_pivots)) + h
             if m_col[i_max].get_coordinates()[k] == 0:

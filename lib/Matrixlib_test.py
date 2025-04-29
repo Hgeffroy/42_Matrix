@@ -27,23 +27,38 @@ class TestMatrixlib:
 
     m1 = Matrix([Vector([-2., -8., 4.]),
                  Vector([1., -23., 4.])])
+    m2 = Matrix([Vector([1., 2., 0., 0.]),
+                 Vector([2., 4., 0., 0.]),
+                 Vector([-1., 2., 1., 1.])])
+    m3 = Matrix([Vector([8., 5., -2.]),
+                 Vector([4., 7., 20.]),
+                 Vector([7., 6., 1.]),
+                 Vector([21., 18., 7.])])
 
-    m20 = Matrix([Vector([1., 0.]), Vector([0., 1.])])
+    m20 = identity_matrix(2, float)
     m21 = Matrix([Vector([2., 1.]), Vector([3., 4.])])
     m22 = Matrix([Vector([20., 10.]), Vector([30., 40.])])
     m23 = Matrix([Vector([2., -2.]), Vector([-2., 2.])])
     m24 = Matrix([Vector([2., 1.]), Vector([4., 2.])])
     m25 = Matrix([Vector([3., -5.]), Vector([6., 8.])])
+    m26 = Matrix([Vector([1., 2.]), Vector([3., 4.])])
 
-    m30 = Matrix([Vector([1., 0., 0.]),
-                  Vector([0., 1., 0.]),
-                  Vector([0., 0., 1.])])
+    m30 = identity_matrix(3, float)
     m31 = Matrix([Vector([2., -5., 0.]),
                   Vector([4., 3., 7.]),
                   Vector([-2., 3., 4.])])
     m32 = Matrix([Vector([-2., -8., 4.]),
                   Vector([1., -23., 4.]),
                   Vector([0., 6., 4.])])
+    m33 = Matrix([Vector([8., 5., -2.]),
+                  Vector([4., 7., 20.]),
+                  Vector([7., 6., 1.])])
+
+    m40 = identity_matrix(4, float)
+    m41 = Matrix([Vector([8., 5., -2., 4.]),
+                  Vector([4., 2.5, 20., 4.]),
+                  Vector([8., 5., 1., 4.]),
+                  Vector([28., -4., 17., 1.])])
 
     def test00(self):
         assert self.v1 + self.v2 == Vector([5., 7., 9.])
@@ -109,34 +124,30 @@ class TestMatrixlib:
         assert self.m1.transpose() == Matrix([Vector([-2., 1.]),
                                               Vector([-8., -23.]),
                                               Vector([4., 4.])])
-    #
-    # def test10(self):
-    #     m1 = Matrix([Vector([1., 0., 0.]), Vector([0., 1., 0.]), Vector([0., 0., 1.])])
-    #     m2 = Matrix([Vector([1., 3.]), Vector([2., 4.])])
-    #     m3 = Matrix([Vector([1., 2.]), Vector([2., 4.])])
-    #     m4 = Matrix([Vector([2., -5., 0.]),
-    #                  Vector([4., 3., 7.]),
-    #                  Vector([-2., 3., 4.])])
-    #     m5 = Matrix([Vector([8., 5., -2., 4., 28.]),
-    #                  Vector([4., 2.5, 20., 4., -4.]),
-    #                  Vector([8., 5., 1., 4., 17.])])
-    #
-    #
-    # def test11(self):
-    #     m1 = Matrix([Vector([2., 0., 0.]), Vector([0., 2., 0.]), Vector([0., 0., 2.])])
-    #     m2 = Matrix([Vector([8., 4., 7.]), Vector([5., 7., 6.]), Vector([-2., 20., 1.])])
-    #     m3 = Matrix([Vector([8., 4., 8., 28.]), Vector([5., 2.5, 5., -4.]), Vector([-2., 20., 1., 17.]), Vector([4., 4., 4., 1.])])
-    #
-    #
-    # def test12(self):
-    #     m1 = identity_matrix(3, float)
-    #     m2 = m1 * 2
-    #     m3 = Matrix([Vector([8., 5., -2]), Vector([4., 7., 20.]), Vector([7., 6., 1.])])
-    #     m4 = Matrix([Vector([1., 0., 1]), Vector([0., 1., 0.]), Vector([0., 0., 1.])])
-    #
-    #
-    # def test13(self):
-    #     m1 = identity_matrix(3, float)
-    #     m2 = Matrix([Vector([1., 2., 0., 0.]), Vector([2., 4., 0., 0.]), Vector([-1., 2., 1., 1.])])
-    #     m3 = Matrix([Vector([8., 5., -2.]), Vector([4., 7., 20.]), Vector([7., 6., 1.]), Vector([21., 18., 7.])])
+
+    def test10(self):
+        assert_row_echelonned(self.m3.row_echelon())
+        assert_row_echelonned(self.m41.row_echelon())
+
+    def test11(self):
+        assert (self.m30 * 2).determinant() == 8.0
+        assert self.m33.determinant() == -174.0
+        assert self.m41.determinant() == 1032.0
+
+    def test12(self):
+        assert self.m30.inverse().mul_mat(self.m30) == self.m30
+        assert self.m33.inverse().mul_mat(self.m33) == self.m30
+        assert self.m41.inverse().mul_mat(self.m41) == self.m40
+
+    def test13(self):
+        assert self.m30.rank() == 3
+        assert self.m2.rank() == 2
+        assert self.m3.rank() == 3
+
+
+def assert_row_echelonned(m: Matrix[float]):
+    shape = m.get_shape()
+    for i in range(shape[1]):
+        for j in range(i + 1, shape[0]):
+            assert m.get_columns()[i].get_coordinates()[j] == 0.
 
