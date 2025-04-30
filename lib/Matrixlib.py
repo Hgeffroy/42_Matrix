@@ -47,7 +47,7 @@ class Vector(Generic[T]):
         return Vector([self._coordinates[c] * scalar for c in range(self._size)])
 
     def __eq__(self, other) -> bool:
-        return all(self._coordinates[i] - other.get_coordinates()[i] < 1e-10 for i in range(self._size))
+        return all(abs(self._coordinates[i] - other.get_coordinates()[i]) < 1e-10 for i in range(self._size))
 
     def __abs__(self) -> float:
         return self.norm_1()
@@ -128,7 +128,7 @@ class Matrix(Generic[T]):
         return Matrix([self._columns[i] * scalar for i in range(self._nbcolumns)])
 
     def __eq__(self, other) -> bool:
-        return all(self._columns == other.get_columns() for i in range(self._nbcolumns))
+        return all(self._columns == other.get_columns())
 
     def get_shape(self) -> Tuple[int, int]:
         return self._nbrows, self._nbcolumns
@@ -162,13 +162,11 @@ class Matrix(Generic[T]):
                                for i in range(self._nbcolumns)]) for j in range(self._nbrows)])
 
     def row_echelon(self) -> 'Matrix[T]':
-        print(f'self: \n{self}')
         m_col = self.transpose().get_columns()
         h = 0
         k = 0
 
         while h < self._nbrows and k < self._nbcolumns:
-            print('iter')
             lst_pivots = [abs(m_col[i].get_coordinates()[k]) for i in range(h, self._nbrows)]
             i_max = lst_pivots.index(max(lst_pivots)) + h
             if m_col[i_max].get_coordinates()[k] == 0:
