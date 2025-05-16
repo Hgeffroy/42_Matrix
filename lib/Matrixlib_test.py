@@ -63,7 +63,7 @@ class TestMatrixlib:
     def test00(self):
         assert self.v1 + self.v2 == Vector([5., 7., 9.])
         assert self.v1 - self.v2 == Vector([-3., -3., -3.])
-        assert self.v1 * 3. == Vector([15., 21., 27.])
+        assert self.v1 * 3. == Vector([3., 6., 9.])
 
     def test01(self):
         assert linear_combination([self.i, self.j, self.k], [10., -2., 0.5]) == Vector([10., -2., 0.5])

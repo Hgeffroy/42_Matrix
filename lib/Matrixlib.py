@@ -37,16 +37,22 @@ class Vector(Generic[T]):
         return self._size
 
     def __add__(self, other) -> 'Vector[T]':
+        if self._size != other.get_size():
+            raise ValueError('Vectors with different sizes cannot be added together')
         return Vector(
             [self._coordinates[c] + other.get_coordinates()[c] for c in range(self._size)])
 
     def __sub__(self, other) -> 'Vector[T]':
+        if self._size != other.get_size():
+            raise ValueError('Vectors with different sizes cannot be subtracted together')
         return Vector([self._coordinates[c] - other.get_coordinates()[c] for c in range(self._size)])
 
     def __mul__(self, scalar: T) -> 'Vector[T]':
         return Vector([self._coordinates[c] * scalar for c in range(self._size)])
 
     def __eq__(self, other) -> bool:
+        if self._size != other.get_size():
+            return False
         return all(abs(self._coordinates[i] - other.get_coordinates()[i]) < 1e-10 for i in range(self._size))
 
     def __abs__(self) -> float:
@@ -128,7 +134,7 @@ class Matrix(Generic[T]):
         return Matrix([self._columns[i] * scalar for i in range(self._nbcolumns)])
 
     def __eq__(self, other) -> bool:
-        return all(self._columns == other.get_columns())
+        return all(self._columns[i] == other.get_columns()[i] for i in range(self._nbcolumns))
 
     def get_shape(self) -> Tuple[int, int]:
         return self._nbrows, self._nbcolumns
